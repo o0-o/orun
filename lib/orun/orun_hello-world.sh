@@ -1,6 +1,6 @@
 # Proof of Concept
 
-: "${VALS[0]:='Hello, world!'}"
+: "${VALS[0]:=Hello, world!}"
 
 printf '%s:\t' 'Shell'                                  &&
 source      "${__LIB_PATH}/out_print.sh"                &&

@@ -7,6 +7,25 @@ set -euo pipefail
 # Debug
 #set -x
 
+# Trap
+declare -a SIGS=('ERR' 'TERM' 'INT' 'QUIT' 'KILL' 'EXIT')
+for SIG in "${SIGS[@]}"; do
+  trap -- 'catch_all $? "${LINENO}" '"${SIG}" "${SIG}"
+done
+
+# Clean up temporary directory on error, exit, interrupt, etc
+catch_all () {
+  CODE="${1-'1'}"
+  LINE="${2-'UNKNOWN'}"
+  SIG="${3-'UNKNOWN SIGNAL'}"
+  rm -rf -- "${__TMP_PATH-'/dev/null'}" 2>/dev/null || :
+  [ ! "${SIG-}" = 'EXIT' ] &&
+  printf '%s\n'                 \
+    "${SIG-} at line ${LINE-}." \
+    'Exiting...' >&2
+  exit "${CODE-'1'}"
+}
+
 # Set supported extensions
 declare -a  EXTS_VALID=('sh' 'py' 'pl' 'rb')  ||
 { printf '%s\n' 'Failed to set supported extensions.' >&2; return 1; }

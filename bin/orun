@@ -1,0 +1,88 @@
+ #/usr/bin/env sh
+
+# Safety first
+set -euo pipefail
+
+# Debug
+#set -x
+
+# PATH sanitizing
+declare PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" &&
+export  PATH                                                &&
+hash -r                                                     ||
+{ printf '%s\n' 'Failed to configure $PATH.' >&2; exit 1; }
+
+# Trap
+declare -a SIGS=('ERR' 'TERM' 'INT' 'QUIT' 'KILL' 'EXIT')
+for SIG in "${SIGS[@]}"; do
+  trap -- 'catch_all $? "${LINENO}" '"${SIG}" "${SIG}"
+done
+
+# Clean up temporary directory on error, exit, interrupt, etc
+catch_all () {
+  CODE="${1-'1'}"
+  LINE="${2-'UNKNOWN'}"
+  SIG="${3-'UNKNOWN SIGNAL'}"
+  rm -rf -- "${__TMP_PATH-'/dev/null'}" 2>/dev/null || :
+  [ ! "${SIG-}" = 'EXIT' ] &&
+  printf '%s\n'                 \
+    "${SIG-} at line ${LINE-}." \
+    'Exiting...' >&2
+  exit "${CODE-'1'}"
+}
+
+# Set paths
+readonly  __BIN_PATH="$(cd "$(dirname "${0}")"; pwd -P)"              &&
+export    __BIN_PATH                                                  &&
+readonly  __NAME="$(basename "${0}")"                                 &&
+export    __NAME                                                      &&
+readonly  __RUN="${__BIN_PATH}/${__NAME}"                             &&
+readonly  __LIB_PATH="$(cd "${__BIN_PATH}/../lib/${__NAME}"; pwd -P)" &&
+export    __LIB_PATH                                                  ||
+{ printf '%s\n' 'Failed to set paths.' >&2; exit 1; }
+
+# Set identifiers
+readonly  __UUID="$(source "${__LIB_PATH}/data_uuid.sh")" &&
+export    __UUID                                          &&
+readonly  __PID="$(source "${__LIB_PATH}/sw_pid.sh")"     &&
+export    __PID                                           ||
+{ printf '%s\n' 'Failed to set IDs.' >&2; exit 1; }
+
+# Set time
+readonly  __TIME_FORMAT="%Y-%m-%d_%H-%M-%S"     &&
+export    __TIME_FORMAT                         &&
+readonly  __TIME="$(date +"${__TIME_FORMAT}")"  &&
+export    __TIME                                ||
+{ printf '%s\n' 'Failed to set time.' >&2; exit 1; }
+
+# Configure temporary directory
+readonly  __TMP_PATH="${TMPDIR:-/tmp}/${__NAME}/${__PID}_${__UUID}"   &&
+export    __TMP_PATH                                                  &&
+mkdir -p "${__TMP_PATH}"                                              ||
+{ printf '%s\n' "Failed to configure temporary directory:${__TMP_PATH}." >&2
+  exit 1; }
+
+# Prefer zsh over bash 4+, don't use other shells
+readonly  __SHELL="$(source "${__LIB_PATH}/sw_shell.sh")" &&
+export    __SHELL                                         ||
+{ printf '%s\n' 'Failed to detect shell.' >&2; exit 1; }
+
+# Shell is already zsh
+[ "${__SHELL}" = 'zsh' ]  ||
+# Switch to zsh if it is available
+declare LIB_CALL='zsh'    ||
+
+{ # Version 4 or higher of bash is available
+  bash --version | egrep -q "version [4-9]" &&
+  { # Shell is already bash
+    [ "${__SHELL}" = 'bash' ] ||
+    # Switch to bash if it is available
+    declare LIB_CALL='bash'
+  }
+}                         ||
+
+{ printf '%s\n' 'zsh or bash 4+ required.' >&2; exit 1; }
+
+# Call main library
+"${LIB_CALL:="source"}" "${__LIB_PATH}/${__NAME}.sh" "${@}"
+exit $?

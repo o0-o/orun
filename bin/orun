@@ -33,26 +33,22 @@ catch_all () {
 
 # Set paths
 readonly  __BIN_PATH="$(cd "$(dirname "${0}")"; pwd -P)"              &&
-export    __BIN_PATH                                                  &&
 readonly  __NAME="$(basename "${0}")"                                 &&
-export    __NAME                                                      &&
 readonly  __RUN="${__BIN_PATH}/${__NAME}"                             &&
 readonly  __LIB_PATH="$(cd "${__BIN_PATH}/../lib/${__NAME}"; pwd -P)" &&
-export    __LIB_PATH                                                  ||
+export    __BIN_PATH __NAME __LIB_PATH                                ||
 { printf '%s\n' 'Failed to set paths.' >&2; exit 1; }
 
 # Set identifiers
 readonly  __UUID="$(source "${__LIB_PATH}/data_uuid.sh")" &&
-export    __UUID                                          &&
 readonly  __PID="$(source "${__LIB_PATH}/sw_pid.sh")"     &&
-export    __PID                                           ||
+export    __UUID __PID                                    ||
 { printf '%s\n' 'Failed to set IDs.' >&2; exit 1; }
 
 # Set time
 readonly  __TIME_FORMAT="%Y-%m-%d_%H-%M-%S"     &&
-export    __TIME_FORMAT                         &&
 readonly  __TIME="$(date +"${__TIME_FORMAT}")"  &&
-export    __TIME                                ||
+export    __TIME_FORMAT __TIME                  ||
 { printf '%s\n' 'Failed to set time.' >&2; exit 1; }
 
 # Configure temporary directory

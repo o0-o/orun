@@ -1,6 +1,6 @@
 # Check for software updates on macOS
 
-softwareupate -l  &&
+softwareupdate -l &&
 brew update       ||
 
 return 1

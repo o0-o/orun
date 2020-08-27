@@ -1,9 +1,9 @@
 # Check for software updates
 
-source "${__LIB_PATH}/check-update_rhel.sh" ||
-source "${__LIB_PATH}/check-update_deb.sh"  ||
-source "${__LIB_PATH}/check-update_bsd.sh"  ||
-source "${__LIB_PATH}/check-update_mac.sh"  ||
+source "${__LIB_PATH}/sw_check-update_rhel.sh"    ||
+source "${__LIB_PATH}/sw_check-update_deb.sh"     ||
+source "${__LIB_PATH}/sw_check-update_freebsd.sh" ||
+source "${__LIB_PATH}/sw_check-update_mac.sh"     ||
 
 return 1
 

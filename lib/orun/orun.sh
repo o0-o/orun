@@ -79,7 +79,7 @@ for EXT in "${EXTS_VALID[@]}"; do
   { [ "${EXT}" = 'sh' ]                           && #source shell libs
     source "${__LIB_PATH}/${COMMAND_LIB}.${EXT}"  || #otherwise execute w/args
     "${__LIB_PATH}/${COMMAND_LIB}.${EXT}" "${OPTS[@]-}" "${VALS[@]-}"
-  }
+  } 3>&2 2>/dev/null #use fd3 for messaging and TODO: fd2 for debug
   return $?
 done
 

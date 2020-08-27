@@ -7,14 +7,18 @@ declare     BUILDING_COMMAND_LIB=0      &&  #true
 declare -a  OPTS                        &&
 declare -a  VALS                        &&
 
-declare EXTS_VALID_RE="("                                         &&
-for EXT in "${EXTS_VALID[@]}"; do EXTS_VALID_RE+="${EXT}|"; done  &&
+declare EXTS_VALID_RE="("                                     &&
+for EXT in "${EXTS_VALID[@]}"; do
+  EXTS_VALID_RE+="${EXT}|"
+done                                                          &&
 # Replace last | with )
-EXTS_VALID_RE="${EXTS_VALID_RE:0:$((${#EXTS_VALID_RE}-1))})"      &&
+EXTS_VALID_RE="${EXTS_VALID_RE:0:$((${#EXTS_VALID_RE}-1))})"  &&
 
-declare LIB_ILLEGAL_RE="["                                                &&
-for CHAR in "${LIB_ILLEGAL_CHARS[@]}"; do LIB_ILLEGAL_RE+="${CHAR}"; done &&
-LIB_ILLEGAL_RE="${LIB_ILLEGAL_RE}]"                                       ||
+declare LIB_ILLEGAL_RE="["                                    &&
+for CHAR in "${LIB_ILLEGAL_CHARS[@]}"; do
+  LIB_ILLEGAL_RE+="${CHAR}"
+done                                                          &&
+LIB_ILLEGAL_RE="${LIB_ILLEGAL_RE}]"                           ||
 
 { printf '%s\n' 'Failed to set parsing variables.' >&2; return 1; }
 
@@ -28,17 +32,20 @@ while [ ! -z "${1-}" ]; do
   } ||
 
   # Store optional arguments (preceded by hyphens)
-  { printf "${1}" | grep -q "^-"  &&
-    OPTS+=("${1}")                &&
+  { printf '%s' "${1}" |
+      grep -q "^-"  &&
+    OPTS+=("${1}")  &&
     shift
   } ||
 
   # Build subcommands as they correspond to libraries
-  { ( exit "${BUILDING_COMMAND_LIB}" )                  &&
-    ! printf '%s' "${1}" | egrep -q "${LIB_ILLEGAL_RE}" &&
-    [ -f  "$( ls "${__LIB_PATH}/${COMMAND_LIB}_$1"* 2>/dev/null  |
-              egrep -m '1' ".*\.${EXTS_VALID_RE}")" ]   &&
-    COMMAND_LIB+="_$1"                                  &&
+  { ( exit "${BUILDING_COMMAND_LIB}" )  &&
+    ! printf '%s' "${1}" |
+      egrep -q "${LIB_ILLEGAL_RE}"      &&
+    [ -f  "$( ls "${__LIB_PATH}/${COMMAND_LIB}_$1"* 2>/dev/null |
+                egrep -m '1' ".*\.${EXTS_VALID_RE}"
+            )" ]                        &&
+    COMMAND_LIB+="_$1"                  &&
     shift
   } ||
 

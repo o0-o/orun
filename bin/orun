@@ -36,7 +36,7 @@ readonly  __BIN_PATH="$(cd "$(dirname "${0}")"; pwd -P)"              &&
 readonly  __NAME="$(basename "${0}")"                                 &&
 readonly  __RUN="${__BIN_PATH}/${__NAME}"                             &&
 readonly  __LIB_PATH="$(cd "${__BIN_PATH}/../lib/${__NAME}"; pwd -P)" &&
-export    __BIN_PATH __NAME __LIB_PATH                                ||
+export    __BIN_PATH __NAME __RUN __LIB_PATH                          ||
 { printf '%s\n' 'Failed to set paths.' >&2; exit 1; }
 
 # Set identifiers

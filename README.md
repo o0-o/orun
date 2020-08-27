@@ -47,6 +47,14 @@ return 0
 
 etc...
 
+`orun` will accept arguments normally or via pipe. When combined, piped arguments are appended.
+
+```
+$ echo 'HELLO YOURSELF' | orun data str lcase 'HELLO WORLD'
+hello world
+hello yourself
+```
+
 ---
 
 Currently, `orun` is written for my personal use. It takes some liberties that you might not expect. Namely:

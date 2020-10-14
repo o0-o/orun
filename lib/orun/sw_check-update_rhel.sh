@@ -1,16 +1,16 @@
-# Check for software updates on Red Hat, CentOS or Fedora Linux
+# CHECK   Software updates in Red Hat-based Linux Distributions
+# STDOUT  Available updates
+########################################################################
 
-# Fedora and recent versions of CentOS/RHEL
-{ sudo dnf check-update ||
-  # exits 100 when updates are available
-  [ "$?" -eq '100' ]
-} ||
+# Fedora and versions 8+ of CentOS/RHEL
+sudo dnf check-update ||
+# Exits 100 when updates are available
+[ "${?}" -eq '100' ]  ||
 
 # Earlier versions of CentOS/RHEL
-{ sudo yum check-update ||
-  # exits 100 when updates are available
-  [ "$?" -eq '100' ]
-} ||
+sudo yum check-update ||
+# Exits 100 when updates are available
+[ "${?}" -eq '100' ]  ||
 
 return 1
 

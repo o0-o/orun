@@ -1,9 +1,10 @@
-# Print the current kernel name and version
+# STDOUT  Kernel name, hardware architecture and kernel version
+########################################################################
 
-printf '%s\t%s\t%s\n'                                 \
-  "$(source "${__LIB_PATH}/orun_sw_kernel_name.sh")"  \
-  "$(source "${__LIB_PATH}/orun_hw_arch.sh")"         \
-  "$(source "${__LIB_PATH}/orun_sw_kernel_version.sh")" ||
+printf  '%s\t%s\t%s\n'                                          \
+  "$( printf  'sw_kernel_name'    | "${_script_wrapper[@]}" )"  \
+  "$( printf  'hw_architecture'   | "${_script_wrapper[@]}" )"  \
+  "$( printf  'sw_kernel_version' | "${_script_wrapper[@]}" )"  ||
 
 return 1
 

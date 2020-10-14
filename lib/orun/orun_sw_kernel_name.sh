@@ -1,6 +1,7 @@
-# Print the current kernel name
+# STDOUT  Kernel name
+########################################################################
 
-uname ||
+"${_script_wrapper[@]}" | "${_run}" str lcase ||
 
 return 1
 

@@ -1,6 +1,7 @@
 # Proof of Concept in Shell
 
-printf '%s\n' "${VALS[0]}" ||
+printf '%s\n' "${@}" ||
+# echo "$@"
 
 return 1
 

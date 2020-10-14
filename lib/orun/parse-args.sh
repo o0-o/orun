@@ -1,77 +1,99 @@
-# Parse orun arguments
+# Setup variables
+declare -a     lib_illegal_chars=('.' '/')                    &&
+declare              command_lib="${_name}"                   &&
+declare     building_command_lib='true'                       &&
+declare -a                params                              &&
 
-# Set parsing variables
-declare -a  LIB_ILLEGAL_CHARS=('.' '/') &&
-declare     COMMAND_LIB="orun"          &&
-declare     BUILDING_COMMAND_LIB=0      &&  #true
-declare -a  OPTS                        &&
-declare -a  VALS                        &&
-
-declare EXTS_VALID_RE="("                                     &&
-for EXT in "${EXTS_VALID[@]}"; do
-  EXTS_VALID_RE+="${EXT}|"
+# Build regex for valid extensions
+declare exts_valid_re="("                                     &&
+for ext in "${exts_valid[@]}"; do
+  exts_valid_re+="${ext}|"
 done                                                          &&
 # Replace last | with )
-EXTS_VALID_RE="${EXTS_VALID_RE:0:$((${#EXTS_VALID_RE}-1))})"  &&
+exts_valid_re="${exts_valid_re:0:$((${#exts_valid_re}-1))})"  &&
 
-declare LIB_ILLEGAL_RE="["                                    &&
-for CHAR in "${LIB_ILLEGAL_CHARS[@]}"; do
-  LIB_ILLEGAL_RE+="${CHAR}"
+# Build regex for valid library
+declare lib_illegal_re="["                                    &&
+for char in "${lib_illegal_chars[@]}"; do
+  lib_illegal_re+="${char}"
 done                                                          &&
-LIB_ILLEGAL_RE="${LIB_ILLEGAL_RE}]"                           ||
+lib_illegal_re="${lib_illegal_re}]"                           ||
 
-{ printf '%s\n' 'Failed to set parsing variables.' >&2; return 1; }
+{ printf 'Failed to set parsing variables' >&2; return 1; }
 
 # Parse arguments into options, subcommands and values
-while [ ! -z "${1-}" ]; do
+while [ ! -z "${1}" ]; do
+  case "${1}" in
 
-  # Respect --
-  { [ "${1}" = "--" ] &&
-    shift             &&
-    BUILDING_COMMAND_LIB=1 #false
-  } ||
+    # Respect --
+    '--'              ) shift && break                                    ;;
 
-  # Store optional arguments (preceded by hyphens)
-  { printf '%s' "${1}" |
-      grep -q "^-"  &&
-    OPTS+=("${1}")  &&
-    shift
-  } ||
+    # Split up grouped options
+    '-'[[:alnum:]][[:alnum:]]*  )
+      declare -a opt=( $( printf '%s' "${1#-}" | sed -e  's/./-& /g' ) )  &&
+      shift                                                               &&
+      opt+=("${@-}")                                                      &&
+      set -- "${opt[@]}"                                                  ;;
 
-  # Build subcommands as they correspond to libraries
-  { ( exit "${BUILDING_COMMAND_LIB}" )  &&
-    ! printf '%s' "${1}" |
-      egrep -q "${LIB_ILLEGAL_RE}"      &&
-    [ -f  "$( ls "${__LIB_PATH}/${COMMAND_LIB}_$1"* 2>/dev/null |
-                egrep -m '1' ".*\.${EXTS_VALID_RE}"
-            )" ]                        &&
-    COMMAND_LIB+="_$1"                  &&
-    shift
-  } ||
+    # Hardcoded flags
+    '--silent'        ) declare verbosity='silent' && shift               ;;
+    '-q'|'--quiet'    ) declare verbosity='quiet'  && shift               ;;
+    '-v'|'--verbose'  ) declare verbosity='info'   && shift               ;;
+    '--debug'         ) declare verbosity='debug'  && shift               ;;
+    '--trace'         ) declare verbosity='trace'  && shift               ;;
 
-  # Additional arguments are values for the subcommand
-  { VALS+=("${1}")  &&
-    shift           &&
-    BUILDING_COMMAND_LIB=1 #false
-  } ||
+    # Binary switches
+    '--syslog'        ) declare    syslog='true'   && shift               ;;
+    '--force'         ) declare     force='true'   && shift               ;;
 
-  { printf '%s\n' "Failed to parse argument: ${1}" >&2; return 1; }
+    # Store options with arguments (preceded by hyphens)
+    '--'[[:alnum:]]*  )
+      declare -a opt=($(printf '%s' "${1#--}" | sed -e 's/=/ /'))         &&
+      # Handle both --flag=value and --flag value
+      { [ -z "${opt[1]-}" ] && shift && opt+=("${1}") || :; }
+      declare "${opt[0]//-/_}"="${opt[1]-}"                               &&
+      shift                                                               ;;
 
-done                          ||
-{ printf '%s\n' "Failed to parse arguments." >&2; return 1; }
+    [[:alnum:]]*      )
+      # Build subcommands as they correspond to libraries
+      { "${building_command_lib}"                                 &&
+        ! printf '%s' "${1}" | egrep -q "${lib_illegal_re}"       &&
+        [ -f  "$( ls "${_lib_path}/${command_lib}_${1}"*  |
+                    egrep -m '1' ".*\.${exts_valid_re}"     )" ]  &&
+        command_lib+="_${1}"                                      &&
+        shift
+      } 2>/dev/null                                                       ||
 
-[ "${COMMAND_LIB}" = 'orun' ] &&
-{ printf '%s\n' "Invalid subcommand." >&2; return 1; }
+      # Additional arguments are positional parameters for the
+      # subcommand
+      { declare building_command_lib='false' &&
+        params+=("${1}") && shift            &&
+      }                                                                   ;;
 
-# Append piped data to values
-[ -p /dev/stdin ]   &&
-{ while read PIPE; do
-    VALS+=("${PIPE}")
-  done ||
-  { printf '%s\n' "Failed to process pipe." >&2; return 1; }
-}                   ||
-[ ! -p /dev/stdin ] ||
+    *                 )
+      printf 'Unrecognized arguments %s\n' "${1}" >&2; shift              ;;
+  esac
+done                          &&
 
-return 1
+# Add remaining arguments to parameters (this will occur if `--` is
+# used)
+params+=("${@-}")             ||
+{ printf 'Failed to parse argument: %s' "${@-}" >&2; return 1; }
+
+# If no subcommands were found, exit
+[ "${command_lib}" = "${_name}" ] &&
+{ printf 'Invalid subcommand' >&2; return 1; }
+
+# Append piped data to parameters
+[   -p '/dev/fd/0' ]  &&
+while read -r pipe; do
+  params+=("${pipe}")
+done                  ||
+[ ! -p '/dev/fd/0' ]  ||
+{ printf 'Failed to process pipe' >&2; return 1; }
+
+# Reset positional parameters to arguments without subcommands or flags
+set -- "${params[@]-}"  ||
+{ printf 'Failed to set parameters' >&2; return 1; }
 
 return 0

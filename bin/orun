@@ -2,83 +2,90 @@
 
 # Safety first
 set -euo pipefail
-
-# Debug
+# Early trace
 #set -x
 
 # PATH sanitizing
-declare PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" &&
-export  PATH                                                &&
+typeset PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" &&
 hash -r                                                     ||
-{ printf '%s\n' 'Failed to configure $PATH.' >&2; exit 1; }
+{ printf 'Failed to configure %s\n' '$PATH' >&2; exit 1; }
 
 # Trap
-declare -a SIGS=('ERR' 'TERM' 'INT' 'QUIT' 'KILL' 'EXIT')
-for SIG in "${SIGS[@]}"; do
-  trap -- 'catch_all $? "${LINENO}" '"${SIG}" "${SIG}"
-done
-
+printf '%s\n' 'ERR' 'TERM' 'INT' 'QUIT' 'KILL' 'EXIT' | while read sig; do
+  trap -- 'catch_all "$0" "$?" "${LINENO}" "'"${sig}"'"' "${sig}"
+done  &&
 # Clean up temporary directory on error, exit, interrupt, etc
-catch_all () {
-  CODE="${1-'1'}"
-  LINE="${2-'UNKNOWN'}"
-  SIG="${3-'UNKNOWN SIGNAL'}"
-  rm -rf -- "${__TMP_PATH-'/dev/null'}" 2>/dev/null || :
-  [ ! "${SIG-}" = 'EXIT' ] &&
-  printf '%s\n'                 \
-    "${SIG-} at line ${LINE-}." \
-    'Exiting...' >&2
-  exit "${CODE-'1'}"
-}
+function catch_all {
+  typeset origin="${1-UNKNOWN}" ; typeset code="${2-1}"
+  typeset   line="${3-UNKNOWN}" ; typeset  sig="${4-UNKNOWN}"
+  # Clean up
+  rm -rf -- "${_tmp_path-/dev/null}" 2>&"${_debug-/dev/null}" || :
+  # Wait for background processes to close
+  wait
+  # Report on non-exit
+  [ ! "${sig}" = 'EXIT' ]     &&
+  printf  '%s at line %s in %s\nExiting...\n' \
+          "${sig}" "${line}" "${origin}"      >&"${_notice-2}"
+  exit "${code}"
+}     ||
+{ printf 'Failed to set traps\n' >&2; exit 1; }
 
-# Set paths
-readonly  __BIN_PATH="$(cd "$(dirname "${0}")"; pwd -P)"              &&
-readonly  __NAME="$(basename "${0}")"                                 &&
-readonly  __RUN="${__BIN_PATH}/${__NAME}"                             &&
-readonly  __LIB_PATH="$(cd "${__BIN_PATH}/../lib/${__NAME}"; pwd -P)" &&
-export    __BIN_PATH __NAME __RUN __LIB_PATH                          ||
-{ printf '%s\n' 'Failed to set paths.' >&2; exit 1; }
-
-# Set identifiers
-readonly  __UUID="$(source "${__LIB_PATH}/data_uuid.sh")" &&
-readonly  __PID="$(source "${__LIB_PATH}/sw_pid.sh")"     &&
-export    __UUID __PID                                    ||
-{ printf '%s\n' 'Failed to set IDs.' >&2; exit 1; }
-
-# Set time
-readonly  __TIME_FORMAT="%Y-%m-%d_%H-%M-%S"     &&
-readonly  __TIME="$(date +"${__TIME_FORMAT}")"  &&
-export    __TIME_FORMAT __TIME                  ||
-{ printf '%s\n' 'Failed to set time.' >&2; exit 1; }
-
-# Configure temporary directory
-readonly  __TMP_PATH="${TMPDIR:-/tmp}/${__NAME}/${__PID}_${__UUID}"   &&
-export    __TMP_PATH                                                  &&
-mkdir -p "${__TMP_PATH}"                                              ||
-{ printf '%s\n' "Failed to configure temporary directory:${__TMP_PATH}." >&2
-  exit 1; }
-
-# Prefer zsh over bash 4+, don't use other shells
-readonly  __SHELL="$(source "${__LIB_PATH}/sw_shell.sh")" &&
-export    __SHELL                                         ||
-{ printf '%s\n' 'Failed to detect shell.' >&2; exit 1; }
+# Prefer zsh over bash 4+, don't use other _shs
+readonly  _sh="$( ps -cp "$$" -o command='' |
+                    cut -d ' ' -f '1'       |
+                    sed -e 's/^-//'             )"  ||
+{ printf 'Failed to detect shell.' >&2; exit 1; }
 
 # Shell is already zsh
-[ "${__SHELL}" = 'zsh' ]  ||
+[ "${_sh}" = 'zsh' ]                    &&
+{ emulate -R zsh && setopt KSH_ARRAYS BASH_REMATCH  ||
+  { printf 'Failed to configure zsh\n' >&2; exit 1; }
+}                                       ||
+
 # Switch to zsh if it is available
-declare LIB_CALL='zsh'    ||
+typeset lib_call="$(command -v 'zsh')"  ||
 
 { # Version 4 or higher of bash is available
-  bash --version | egrep -q "version [4-9]" &&
+  bash --version | grep -q "version [4-9]"  &&
   { # Shell is already bash
-    [ "${__SHELL}" = 'bash' ] ||
+    [ "${_sh}" = 'bash' ] ||
     # Switch to bash if it is available
-    declare LIB_CALL='bash'
+    typeset lib_call='bash'
   }
-}                         ||
+}                                       ||
+{ printf 'zsh or bash 4+ required\n' >&2; exit 1; }
 
-{ printf '%s\n' 'zsh or bash 4+ required.' >&2; exit 1; }
+# Switch shells if better option exists
+# Don't need to be strictly posix after this point
+[ ! -z "${lib_call-}" ] &&
+{ "${lib_call}" "${0}" "${@-}"; exit $?; }
 
-# Call main library
-"${LIB_CALL:="source"}" "${__LIB_PATH}/${__NAME}.sh" "${@}"
-exit $?
+# Set paths
+declare -r  _bin_path="$(cd "$(dirname "${0}")"; pwd -P)"             &&
+declare -r      _name="$(basename "${0}")"                            &&
+declare -r       _run="${_bin_path}/${_name}"                         &&
+declare -r  _lib_path="$(cd "${_bin_path}/../lib/${_name}"; pwd -P)"  &&
+declare -r        _cd="$(pwd -P)"                                     ||
+{ printf 'Failed to set paths\n' >&2; exit 1; }
+
+# Set identifiers
+declare -r  _uuid="$(. "${_lib_path}/uuid.sh")"       &&
+declare -r   _pid="$(. "${_lib_path}/sw_pid.sh")"     ||
+{ printf 'Failed to set IDs\n' >&2; exit 1; }
+
+# Set time
+declare -r  _time_format="%Y-%m-%d_%H-%M-%S"          &&
+declare -r         _time="$(date +"${_time_format}")" ||
+{ printf 'Failed to set time\n' >&2; exit 1; }
+
+# Configure temporary directory
+declare     _tmp_path="${TMPDIR-/tmp}"                            &&
+declare -r  _tmp_path="${_tmp_path%/}/${_name}/${_pid}_${_uuid}"  &&
+install -m 700 -d "${_tmp_path}"                                  ||
+{ printf 'Failed to configure temporary directory: %s\n' "${_tmp_path}" >&2
+  exit 1; }
+
+declare -r _script_wrapper=('source' "${_lib_path}/wrapper.sh") &&
+source "${_lib_path}/orun.sh"
+
+exit "${?}"

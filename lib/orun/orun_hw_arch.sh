@@ -1,7 +1,1 @@
-# Print hardware architecture
-
-uname -m ||
-
-return 1
-
-return 0
+orun_hw_architecture.sh

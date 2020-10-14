@@ -1,7 +1,7 @@
 # Proof of Concept in Ruby
 
 begin
-  puts ARGV[0]
+  puts ARGV
 rescue
   exit(1)
 end

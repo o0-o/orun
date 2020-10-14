@@ -1,3 +1,5 @@
 # Print arguments
 
-puts [lindex $argv 0]
+foreach arg $::argv {
+  puts "$arg"
+}

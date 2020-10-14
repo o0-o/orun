@@ -1,4 +1,5 @@
-# Print the current kernel name
+# STDOUT  Kernel name
+########################################################################
 
 uname ||
 

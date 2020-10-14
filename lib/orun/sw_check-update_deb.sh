@@ -1,10 +1,16 @@
-# Check for software updates on Debian or Ubuntu
+# CHECK   Software updates in Debian-based Linux distributions
+# STDOUT  Available updates
+# STDERR  Redirected stdout from metadata update
+########################################################################
 
-# Debian and early versions of Ubuntu
-apt-get update  ||
+sudo apt-get update >&2 &&
+#apt update
 
-# Recent versions of Ubuntu
-apt update      ||
+sudo apt-get  upgrade
+              --show-upgraded
+              --assume-no
+#apt-get upgrade -u --assume-no
+#apt list --upgradeable
 
 return 1
 

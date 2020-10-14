@@ -1,26 +1,28 @@
-# Proof of Concept
+# STDOUT  'Hello, world!' or parameters separated by new line in all
+#         supported scripting languages
+########################################################################
 
-: "${VALS[0]:=Hello, world!}"
+set -- "${@:-Hello, world!}"
 
-printf '%-8s' 'Shell:'                                  &&
-source      "${__LIB_PATH}/out_print.sh"                &&
+printf '%s\n'   'Shell:'                              &&
+source          "${_lib_path}/out_print.sh"           &&
 
-printf '%-8s' 'AWK:'                                    &&
-printf '%-8s' "${VALS[@]-}" |
-  awk -f      "${__LIB_PATH}/out_print.awk"             &&
+printf '\n%s\n' 'AWK:'                                &&
+printf '%s\n'   "${@}"  |
+  awk   -f      "${_lib_path}/out_print.awk"          &&
 
-printf '%-8s' 'TCL:'                                    &&
-tclsh       "${__LIB_PATH}/out_print.tcl" "${VALS[@]-}" &&
+printf '\n%s\n' 'TCL:'                                &&
+tclsh           "${_lib_path}/out_print.tcl"  "${@}"  &&
 
-printf '%-8s' 'Perl:'                                   &&
-perl        "${__LIB_PATH}/out_print.pl"  "${VALS[@]-}" &&
+printf '\n%s\n' 'Perl:'                               &&
+perl            "${_lib_path}/out_print.pl"   "${@}"  &&
 
-printf '%-8s' 'Python:'                                 &&
-"${PYTHON}" "${__LIB_PATH}/out_print.py"  "${VALS[@]-}" &&
+printf '\n%s\n' 'Python:'                             &&
+"${_python}"    "${_lib_path}/out_print.py"   "${@}"  &&
 
-printf '%-8s' 'Ruby:'                                   &&
-ruby        "${__LIB_PATH}/out_print.rb"  "${VALS[@]-}" ||
+printf '\n%s\n' 'Ruby:'                               &&
+ruby            "${_lib_path}/out_print.rb"   "${@}"  ||
 
-return 1
+{ printf '%s\n' 'Hello world failed.' >&"${_err}"; return 1; }
 
 return 0

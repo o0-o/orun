@@ -2,8 +2,8 @@
 
 use strict;
 
-print "$ARGV[0]\n" ||
-
-exit 1;
+foreach (@ARGV) {
+  print "$_\n" || exit 1;
+}
 
 exit 0;

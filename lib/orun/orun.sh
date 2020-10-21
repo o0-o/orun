@@ -47,6 +47,8 @@ declare -a  exts_valid=('sh' 'awk' 'tcl' 'pl' 'py' 'rb')        &&
 # Redirect stdout based on verbosity and catch all stderr in debug
 printf  '%s' "${command_lib}" |
   "${_script_wrapper[@]}"     1>&"${_stdout}" \
-                              2>&"${_debug}"
+                              2>&"${_debug}"  ||
 
 return "${?}"
+
+return 0

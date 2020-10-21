@@ -78,11 +78,11 @@ done                          &&
 # Add remaining arguments to parameters (this will occur if `--` is
 # used)
 params+=("${@-}")             ||
-{ printf 'Failed to parse argument: %s' "${@-}" >&2; return 1; }
+{ printf 'Failed to parse argument: %s\n' "${@-}" >&2; return 1; }
 
 # If no subcommands were found, exit
 [ "${command_lib}" = "${_name}" ] &&
-{ printf 'Invalid subcommand' >&2; return 1; }
+{ printf 'Invalid subcommand\n' >&2; return 1; }
 
 # Append piped data to parameters
 [   -p '/dev/fd/0' ]  &&
@@ -90,10 +90,10 @@ while read -r pipe; do
   params+=("${pipe}")
 done                  ||
 [ ! -p '/dev/fd/0' ]  ||
-{ printf 'Failed to process pipe' >&2; return 1; }
+{ printf 'Failed to process pipe\n' >&2; return 1; }
 
 # Reset positional parameters to arguments without subcommands or flags
 set -- "${params[@]-}"  ||
-{ printf 'Failed to set parameters' >&2; return 1; }
+{ printf 'Failed to set parameters\n' >&2; return 1; }
 
 return 0

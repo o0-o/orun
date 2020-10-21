@@ -54,7 +54,7 @@ while [ ! -z "${1}" ]; do
       declare "${opt[0]//-/_}"="${opt[1]-}"                               &&
       shift                                                               ;;
 
-    [[:alnum:]]*      )
+    [[:graph:]]*      )
       # Build subcommands as they correspond to libraries
       { "${building_command_lib}"                                 &&
         ! printf '%s' "${1}" | egrep -q "${lib_illegal_re}"       &&

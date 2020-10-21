@@ -39,6 +39,7 @@ while [ ! -z "${1}" ]; do
     '--silent'        ) declare verbosity='silent' && shift               ;;
     '-q'|'--quiet'    ) declare verbosity='quiet'  && shift               ;;
     '-v'|'--verbose'  ) declare verbosity='info'   && shift               ;;
+    '--info'          ) declare verbosity='info'   && shift               ;;
     '--debug'         ) declare verbosity='debug'  && shift               ;;
     '--trace'         ) declare verbosity='trace'  && shift               ;;
 

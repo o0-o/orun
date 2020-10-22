@@ -8,17 +8,21 @@
 
 # Verbosity/log levels from most to least verbose
 declare -a levels=( 'debug' 'info' 'notice' 'warning'
-                    'err'   'crit' 'alert'  'emerg'   )   &&
+                    'err'   'crit' 'alert'  'emerg'   )     &&
 
 # Additional verbosity options
 case "${verbosity}" in
-  'silent'  )         declare   _stdout='/dev/null' ;&
-  'quiet'   )         declare   _stderr='/dev/null' ;;
-  'trace'   ) set -x; declare verbosity='debug'
-                      declare     trace='true'      ;&
-  *         )         declare   _stdout='1'
-                      declare   _stderr='2'         ;;
-esac                                                      ||
+  'silent'  )         declare     _stdout='/dev/null' ;&
+  'quiet'   )         declare     _stderr='/dev/null' ;;
+  'trace'   ) set -x; declare   verbosity='debug'
+                      declare       trace='true'      ;&
+  *         )         declare     _stdout='1'
+                      declare     _stderr='2'
+                      declare _stdout_alt='3'
+                      exec 3>&"${_stdout}"
+                      declare _stderr_alt='4'
+                      exec 4>&"${_stderr}"            ;;
+esac                                                        ||
 { printf 'Failed to set verbosity/log parameters\n' >&2; return 1; }
 
 # Configure file descriptor and redirects for each active level
@@ -59,12 +63,10 @@ for level in "${levels[@]}"; do
   [ "${level}"      = 'debug' ] &&
   [ "${verbosity}"  = 'debug' ] &&
   source  "${_lib_path}/debug_header.sh" || :
-  printf  "${debug_parameter_format}" \
-          "${level}" "FD${fd-/dev/null}" >&"${_debug}"
 
   unset fd
 
-done                                                                ||
+done                                                        ||
 { printf 'Failed to configure verbosity/log file descriptors\n' >&2;
   return 1; }
 

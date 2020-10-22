@@ -1,4 +1,5 @@
 # Setup variables
+declare -a  exts_valid=('sh' 'awk' 'tcl' 'pl' 'py' 'rb')        &&
 declare -a     lib_illegal_chars=('.' '/')                    &&
 declare              command_lib="${_name}"                   &&
 declare     building_command_lib='true'                       &&
@@ -22,7 +23,7 @@ lib_illegal_re="${lib_illegal_re}]"                           ||
 { printf 'Failed to set parsing variables' >&2; return 1; }
 
 # Parse arguments into options, subcommands and values
-while [ ! -z "${1}" ]; do
+while [ ! -z "${1-}" ]; do
   case "${1}" in
 
     # Respect --

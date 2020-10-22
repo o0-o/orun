@@ -79,8 +79,7 @@ for ext in "${exts_valid[@]}"; do
   [ ! -f "${_lib_path}/${script}.${ext}" ]  ||
   { printf 'Error running %s.%s in wrapper\n' "${script}" "${ext}" >&"${_err}"
     return 1; }
-done  ||
+done
 
-{ printf '%s not found\n' "${script}" >&"${_err}"; return 1; }
-
-return 0
+{ printf '%s not found\n' "${script}" >&"${_err}"
+  return "$_code_not_found}"; }

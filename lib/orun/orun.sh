@@ -34,15 +34,14 @@ source "${_lib_path}/exit-codes.sh" ||
 { printf 'Failed to load exit codes\n' >&2; return 1; }
 
 # Parse arguments
-source "${_lib_path}/parse-args.sh" ||
+declare -a  exts_valid=('sh' 'awk' 'tcl' 'pl' 'py' 'rb')  &&
+source "${_lib_path}/parse-args.sh"                       ||
 { printf 'Failed to parse arguments\n' >&2; return 1; }
 
 # Start stderr/log control
 source "${_lib_path}/verbosity-and-logger.sh" ||
 { printf 'Failed to configure verbosity and logging\n' >&2; return 1; }
 
-# Set supported extensions and execute first available
-declare -a  exts_valid=('sh' 'awk' 'tcl' 'pl' 'py' 'rb')        &&
 # Use the command wrapper to run $command_lib
 # Redirect stdout based on verbosity and catch all stderr in debug
 printf  '%s' "${command_lib}" |

@@ -62,7 +62,21 @@ Result in:
    stdout alt = FD14
        stderr = FD2
    stderr alt = FD15
+    verbosity = debug
+       syslog = false
+    log level = debug
+       stdout = FD1
+   stdout alt = FD14
+       stderr = FD2
+   stderr alt = FD15
         debug = FD16
+         info = FD17
+       notice = FD18
+      warning = FD19
+          err = FD20
+         crit = FD21
+        alert = FD22
+        emerg = FD23
 +/Users/o0-o/.local/lib/orun/wrapper.sh:17> source /Users/o0-o/.local/lib/orun/str_lcase.sh
 +/Users/o0-o/.local/lib/orun/str_lcase.sh:4> printf '%s\n' 'Hello world'
 +/Users/o0-o/.local/lib/orun/str_lcase.sh:6> tr '[[:upper:]]' '[[:lower:]]'

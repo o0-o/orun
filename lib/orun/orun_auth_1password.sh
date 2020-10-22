@@ -2,11 +2,7 @@
 #               provided, look in macOS keychain for one. If token is
 #               invalid or expired, fall back to password auth.
 #
-<<<<<<< HEAD
 #               Password auth uses --domain ($3) with --password ($1),
-=======
-#               Otherwise, use --domain ($3) with --password ($1),
->>>>>>> 388912c81ee09ee0fbc11bbbb5a415702b642f4f
 #               --email ($2) and --secret ($4).
 #
 #               If the account has been logged in previously on the
@@ -23,7 +19,7 @@
 #               Note that --password ($1) may also be the session token,
 #               but there is not an attempt to use --token as the
 #               master password. This allows either token or password to
-#               be piped to the command or used as the only positional
+#               be tpiped to the command or used as the only positional
 #               argument.
 #
 # STDOUT        1Password session token

@@ -5,9 +5,9 @@
 
 `orun` will use either ZSH or BASH depending on what is available. It prefers ZSH but will fallback to BASH if it's at least version 4. This allows `orun` to operate on systems without ZSH while preferring ZSH over the antiquated version of BASH on macOS. `orun` also requires version 3 of Python. Currently, it does not check for versions of Perl or Ruby, but it may in the future.
 
-While `orun` will look for library scripts with the `orun_` prefix, those prefixed scripts typically call their own subscripts, each responsible for an atomic operation. In most cases, the prefixed scripts are platform-agnostic while each subscript performs platform-specific operations. Portability is achieved via trial-and-error logic as long as command failure is non-destructive (`command not found` usually).
+While `orun` will look for library scripts with the `orun_` prefix, those prefixed scripts typically call their own subscripts, each responsible for an atomic operation. In most cases, the prefixed scripts are platform-agnostic while each subscript performs platform-specific operations. Portability is achieved via trial-and-error logic as long as command failure is non-destructive (`command not found` usually). 
 
-Subscripts are very short, include minimal boilerplate and may be written in AWK or TCL/Expect in addition to Perl, Ruby or Python. Additionally, subscripts serve as a command reference. While comments are succinct, they are written so that someone unfamiliar with the commands can make sense of them. Alternative versions of commands are also included (commented) to show how a command might be written on the fly.
+Subscripts are very short, include minimal boilerplate and may be written in AWK or TCL/Expect in addition to shell, Perl, Ruby or Python. Additionally, subscripts serve as a command reference, similar to a gist. While comments are succinct, they are written so that someone unfamiliar with the commands can make sense of them. Alternative versions of commands are also included (commented) to show how a command might be written on the fly.
 
 `orun_sw_check-update.sh`
 ```
@@ -56,6 +56,10 @@ $ echo 'HELLO YOURSELF' | orun data str lcase 'HELLO WORLD'
 hello world
 hello yourself
 ```
+
+## \*nix Agnostic
+
+A somewhat bold claim. Realistically, `orun` targets compatibility with current versions of Debian, Ubuntu LTS, CentOS, Fedora, FreeBSD and macOS.
 
 ---
 

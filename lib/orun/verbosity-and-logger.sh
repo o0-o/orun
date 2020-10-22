@@ -57,9 +57,12 @@ for level in "${levels[@]}"; do
   declare -r "_${level}"="${fd-/dev/null}"
 
   # Debug
-  [ "${level}"      = 'debug' ] &&
-  [ "${verbosity}"  = 'debug' ] &&
-  source  "${_lib_path}/debug_header.sh" || :
+  declare debug_parameter_format='%13s = %s\n'
+  [ "${level}"      = 'debug' ]                         &&
+  [ "${verbosity}"  = 'debug' ]                         &&
+  source  "${_lib_path}/debug_header.sh"                || :
+  printf  "${debug_parameter_format}"     \
+          "${level}" "FD${fd-/dev/null}"  >&"${_debug}" || :
 
   unset fd
 

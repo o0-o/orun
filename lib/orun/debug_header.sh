@@ -1,4 +1,3 @@
-declare debug_parameter_format='%13s = %s\n'
 printf    '%s\n'                                        \
           '-------------------------------------------' \
           '|      ____     ___     __  __   _  __    |' \
@@ -28,5 +27,3 @@ printf    "${debug_parameter_format}"                   \
           'stdout alt'  "FD${_stdout_alt}"              \
           'stderr'      "FD${_stderr}"                  \
           'stderr alt'  "FD${_stderr_alt}"              >&"${_debug}"
-printf    "${debug_parameter_format}"                   \
-          "${level}" "FD${fd-/dev/null}"                >&"${_debug}"

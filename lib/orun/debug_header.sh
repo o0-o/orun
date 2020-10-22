@@ -25,6 +25,8 @@ declare i='1' && for param; do
 done
 printf    "${debug_parameter_format}"                   \
           'stdout'      "FD${_stdout}"                  \
-          'stderr'      "FD${_stderr}"                  >&"${_debug}"
+          'stdout alt'  "FD${_stdout_alt}"              \
+          'stderr'      "FD${_stderr}"                  \
+          'stderr alt'  "FD${_stderr_alt}"              >&"${_debug}"
 printf    "${debug_parameter_format}"                   \
           "${level}" "FD${fd-/dev/null}"                >&"${_debug}"

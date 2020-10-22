@@ -35,7 +35,7 @@ $ orun str --debug lcase 'HELLO WORLD'
 ```
 
 ```
-$ orun --debug str lcase 'HELLO WORLD' --debug
+$ orun str lcase 'HELLO WORLD' --debug
 ```
 
 Result in:

@@ -2,7 +2,11 @@
 #               provided, look in macOS keychain for one. If token is
 #               invalid or expired, fall back to password auth.
 #
+<<<<<<< HEAD
 #               Password auth uses --domain ($3) with --password ($1),
+=======
+#               Otherwise, use --domain ($3) with --password ($1),
+>>>>>>> 388912c81ee09ee0fbc11bbbb5a415702b642f4f
 #               --email ($2) and --secret ($4).
 #
 #               If the account has been logged in previously on the

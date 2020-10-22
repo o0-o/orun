@@ -19,7 +19,7 @@
 #               Note that --password ($1) may also be the session token,
 #               but there is not an attempt to use --token as the
 #               master password. This allows either token or password to
-#               be tpiped to the command or used as the only positional
+#               be piped to the command or used as the only positional
 #               argument.
 #
 # STDOUT        1Password session token

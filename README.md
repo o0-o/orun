@@ -57,7 +57,7 @@ Result in:
     verbosity = debug
        syslog = false
     log level = debug
-           $1 = Hello world
+           $1 = HELLO WORLD
        stdout = FD1
    stdout alt = FD14
        stderr = FD2

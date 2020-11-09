@@ -82,4 +82,4 @@ for ext in "${exts_valid[@]}"; do
 done
 
 { printf '%s not found\n' "${script}" >&"${_err}"
-  return "$_code_not_found}"; }
+  return "${_code_not_found}"; }

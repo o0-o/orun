@@ -8,11 +8,11 @@ sed -n                                \
     -E                                \
     -e  '/('"${upper_attribute}"'|'"${lower_attribute}"')/ {
           :loop
-            /^[[:space:]]*inet / {
-              s/^[[:space:]]*inet ([0-9,.]*) .*$/\1/
+            /^[[:print:]]*mtu / {
+              s/^[[:print:]]*mtu ([[:digit:]]*).*$/\1/
               p
             }
-            /^IP4\.ADDRESS/ {
+            /^GENERAL\.MTU/ {
               s|^.*[[:space:]]([0-9,.]*)/.*$|\1|
               p
             }
@@ -30,11 +30,11 @@ sed -n                                \
     -E                                \
     -e  '/('"${upper_attribute}"'|'"${lower_attribute}"')/ {
          :loop
-            /^[[:space:]]*inet / {
-              s/^[[:space:]]*inet ([0-9,.]*) .*$/\1/
+            /^[[:print:]]*mtu / {
+              s/^[[:print:]]*mtu ([[:digit:]]*).*$/\1/
               p
             }
-            /^IP4\.ADDRESS/ {
+            /^GENERAL\.MTU/ {
               s|^.*[[:space:]]([0-9,.]*)/.*$|\1|
               p
             }

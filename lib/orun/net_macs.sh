@@ -1,4 +1,4 @@
-# STDOUT  IP address(es) with $upper_attribute or $lower_attribute
+# STDOUT  Mac address(ss) with $upper_attribute or $lower_attribute
 ########################################################################
 
 # Try ifconfig but fallback to nmcli for Linux OS's without ifconfig
@@ -8,12 +8,12 @@ sed -n                                \
     -E                                \
     -e  '/('"${upper_attribute}"'|'"${lower_attribute}"')/ {
           :loop
-            /^[[:space:]]*inet / {
-              s/^[[:space:]]*inet ([0-9,.]*) .*$/\1/
+            /^[[:space:]]*ether/ {
+              s/^[[:space:]]*ether ([[:xdigit:],:]*).*$/\1/
               p
             }
-            /^IP4\.ADDRESS/ {
-              s|^.*[[:space:]]([0-9,.]*)/.*$|\1|
+            /^GENERAL\.HWADDR:/ {
+              s/^.*[[:space:]]//
               p
             }
             n
@@ -30,12 +30,12 @@ sed -n                                \
     -E                                \
     -e  '/('"${upper_attribute}"'|'"${lower_attribute}"')/ {
          :loop
-            /^[[:space:]]*inet / {
-              s/^[[:space:]]*inet ([0-9,.]*) .*$/\1/
+            /^[[:space:]]*ether/ {
+              s/^[[:space:]]*ether ([[:xdigit:],:]*).*$/\1/
               p
             }
-            /^IP4\.ADDRESS/ {
-              s|^.*[[:space:]]([0-9,.]*)/.*$|\1|
+            /^GENERAL\.HWADDR:/ {
+              s/^.*[[:space:]]//
               p
             }
           /^[[:space:]]/ {

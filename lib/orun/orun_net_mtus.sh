@@ -1,4 +1,4 @@
-# STDOUT  IPv4 addresse(s) with --attribute ($1)
+# STDOUT  MTU(s) with --attribute ($1) or all MTU(s)
 ########################################################################
 
 # User $1 if it exists and --attribute isn't set
@@ -8,7 +8,7 @@
 [ ! -z "${attribute-}" ]                                                  &&
 declare upper_attribute="$( "${_run}" str ucase "${attribute//\./\\.}" )" &&
 declare lower_attribute="$( "${_run}" str lcase "${attribute//\./\\.}" )"
-# Default if no value is provided (all addresses are printed)
+# Default if no value is provided (all MTUs are printed)
 : ${upper_attribute:=[[:print:]]*}
 : ${lower_attribute:=[[:print:]]*}
 

@@ -1,4 +1,4 @@
-# STDOUT  IPv4 addresse(s) with --attribute ($1)
+# STDOUT  Mac address(es) with --attribute ($1)
 ########################################################################
 
 # User $1 if it exists and --attribute isn't set
@@ -12,7 +12,7 @@ declare lower_attribute="$( "${_run}" str lcase "${attribute//\./\\.}" )"
 : ${upper_attribute:=[[:print:]]*}
 : ${lower_attribute:=[[:print:]]*}
 
-"${_script_wrapper[@]}"  | sort  | uniq                                   ||
+"${_script_wrapper[@]}" | sort  | uniq                                    ||
 
 return 1
 

@@ -10,7 +10,6 @@ sed -n                                \
     -E                                \
     -e  '/('"${upper_attribute}"'|'"${lower_attribute}"')/ {
           :loop
-            n
             /^[[:lower:]].*:/ {
               s/:.*$//
               p
@@ -19,8 +18,14 @@ sed -n                                \
               s/GENERAL.DEVICE:[[:space:]]*//
               p
             }
-          /^[[:space:]]/ b loop
-          /^[[:upper:]]/ b loop
+          /^[[:space:]]/ {
+            n
+            b loop
+          }
+          /^[[:upper:]]/ {
+            n
+            b loop
+          }
         }'                                  ||
 
 return 1

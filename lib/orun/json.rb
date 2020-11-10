@@ -30,29 +30,12 @@ begin
       parsed = parsed[field.to_i]
     end
   end
-  # Print results as a hash
-  begin
-    # Determine longest key for formatting
-    longest_key_length = 0
-    parsed.each do |key, value|
-      if longest_key_length < key.length then
-        longest_key_length = key.length
-      end
-    end
-    # Print key and value separated by a colon
-    parsed.each do |key, value|
-      puts key.ljust(longest_key_length + 1) + ': ' + value
-    end
-  # Print results as an array
-  rescue
-    begin
-      parsed.each do |value|
-        puts value
-      end
-    # Print result as a string
-    rescue
-      puts parsed
-    end
+  # Print resulting JSON
+  if (parsed.is_a?(Hash))
+    puts parsed.to_json
+  # Unless result is a single value, print as string (to remove quotes)
+  else
+    puts parsed.to_s
   end
 rescue
   exit(1)
